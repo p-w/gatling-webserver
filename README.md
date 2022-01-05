@@ -3,6 +3,8 @@
 Gatling is a small and fast HTTP webserver and reverse proxy that makes deploying microservices or websites easy.
 Gatling is particularly good in situations with very high load.
 
+![Docker Pulls](https://img.shields.io/docker/pulls/wilfahrt/gatling-webserver) ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/wilfahrt/gatling-webserver/latest)
+
 ## Quick reference
 * Maintained by: [PW](https://github.com/p-w/)
 * Where to get help: [running the docker image](https://github.com/p-w/gatling-webserver), [fefe's gatling](https://www.fefe.de/gatling/)
