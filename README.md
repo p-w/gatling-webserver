@@ -7,6 +7,7 @@ Gatling is particularly good in situations with very high load.
 
 ## Quick reference
 * Maintained by: [PW](https://github.com/p-w/)
+* Get it on [dockerhub](https://hub.docker.com/r/wilfahrt/gatling-webserver)
 * Where to get help: [running the docker image](https://github.com/p-w/gatling-webserver), [fefe's gatling](https://www.fefe.de/gatling/)
 * If you want to take part in gatling, please subscribe to the gatling mailing list (send an empty email to gatling-subscribe@fefe.de).
 
@@ -30,6 +31,9 @@ Gatling is particularly good in situations with very high load.
 * Read-only SMB1 support (was once good enough to read a specific file from Windows or using smbclient from Samba but now SMB1 is deprecated, so less useful)
 
 ## gatling v0.17 - Example usage
+
+Pull the image:
+```docker pull wilfahrt/gatling-webserver```
 
 Enable `docker` provider:
 
