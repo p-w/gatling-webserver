@@ -1,4 +1,4 @@
-FROM       alpine:latest
+FROM       amd64/alpine:latest
 MAINTAINER https://github.com/p-w
 LABEL      Description="gatling - a high performance web server (built with dietlibc)"
 
