@@ -1,4 +1,5 @@
-<div align="center"><h1>gatling<br>a high performance web server</h2>
+<div align="center">
+<h1>gatling<br>a high performance web server</h1>
 
 Gatling is a <b>small and fast</b> HTTP webserver and reverse proxy that makes deploying microservices or websites easy. Gatling is particularly good in situations with very high load. It's designed to adhere green software standards. 10% of the next best webserver image so sustainability is a core priority, just as important as performance, security, cost and accessibility. Let's <b>minimise carbon</b>  and <b>maximise trust</b>.
 
