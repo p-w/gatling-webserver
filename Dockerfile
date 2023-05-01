@@ -37,6 +37,7 @@ RUN \
   mv gatling / && \
   echo "**** cleanup ****" && \
   apk del make gcc cvs zlib-dev libc-dev openssl-dev && \
-  rm -rf /tmp/*
+  rm -rf /tmp/* && \
+  rm -rf /var/cache/apk/*
 
 ENTRYPOINT /gatling ${GATLING_OPTIONS}
