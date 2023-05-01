@@ -1,9 +1,9 @@
 <div align="center">
 <h1>gatling<br>a high performance web server</h1>
 
-Gatling is a <b>small and fast</b> HTTP webserver and reverse proxy that makes deploying microservices or websites easy. Gatling is particularly good in situations with very high load. It's designed to adhere green software standards. 10% of the next best webserver image so sustainability is a core priority, just as important as performance, security, cost and accessibility. Let's <b>minimise carbon</b>  and <b>maximise trust</b>.
+Gatling is a <b>small and fast</b> HTTP webserver and reverse proxy that makes deploying microservices or websites easy. Gatling is particularly good in situations with very high load. It's designed to adhere green software standards. 10% of the next best webserver image so sustainability is a core priority, just as important as performance, security, cost and accessibility. Let's <b>minimise carbon</b> and <b>maximise trust</b>.
 
-![Docker Pulls](https://img.shields.io/docker/pulls/wilfahrt/gatling-webserver) ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/wilfahrt/gatling-webserver/latest) ![GitHub last commit](https://img.shields.io/github/last-commit/p-w/gatling-webserver) ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/wilfahrt/gatling-webserver) ![GitHub](https://img.shields.io/github/license/p-w/gatling-webserver)  ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/wilfahrt/gatling-webserver)
+![Docker Pulls](https://img.shields.io/docker/pulls/wilfahrt/gatling-webserver) ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/wilfahrt/gatling-webserver/latest) ![GitHub last commit](https://img.shields.io/github/last-commit/p-w/gatling-webserver) ![Docker Image Version (latest by date)](https://img.shields.io/docker/v/wilfahrt/gatling-webserver) ![GitHub](https://img.shields.io/github/license/p-w/gatling-webserver) ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/wilfahrt/gatling-webserver)
 </div>
 
 ## Quick reference
@@ -61,4 +61,9 @@ Start a backend server, named `test` with [traefik/whoami](https://hub.docker.co
 docker run -d --name test traefik/whoami
 ```
 
-And finally, you can access to your `whoami` server through gatling, on the domain name `test.docker.localhost`:
+And finally, you can access to your `whoami` server through gatling, on the domain name `test.docker.localhost`.
+
+<div align="center">
+  <hr>
+  <small>a <a href="https://pw.is/" target="_blank">PW</a> project</small>
+</div>
