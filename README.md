@@ -31,7 +31,7 @@
 * Can detect some common mime types itself, like file(1)
 * Read-only SMB1 support (was once good enough to read a specific file from Windows or using smbclient from Samba but now SMB1 is deprecated, so less useful)
 
-## gatling v0.17 - Example usage
+## gatling v0.17 - Example Usage
 
 Pull the image:
 ```docker pull wilfahrt/gatling-webserver```
