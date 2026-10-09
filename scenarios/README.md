@@ -91,8 +91,11 @@ Die Optionen stammen aus der Usage-Ausgabe und dem Quelltext von gatling
   beiden Containern gleich ein und setzt `GATLING_CHROOT=0`.
 - **Kein URL-Rewrite.** gatling kennt kein `try_files`. WordPress-Permalinks
   funktionieren nur als "Einfach" (`?p=123`) oder im PATH_INFO-Format
-  (`/index.php/%year%/%postname%/`). Die Regex in `-O` steht deshalb ohne
-  `$`, damit `index.php/...` noch matcht.
+  (`/index.php/%year%/%postname%/`), einzustellen unter Einstellungen,
+  Permalinks. Die Regex in `-O` steht deshalb ohne `$`, damit
+  `index.php/...` noch matcht. Solange "Einfach" aktiv ist, leitet
+  WordPress `/index.php/<pfad>` selbst auf `/<pfad>` um, was gatling dann
+  mit 404 beantwortet; das ist WordPress-Verhalten, kein gatling-Fehler.
 - **Pfade mit `/.` werden intern zu `/:` umgeschrieben.** Dotfiles wie
   `.proxy`, `.htaccess` oder `.secret` sind so nie abrufbar. Das gilt aber
   auch für `/.well-known/`, was für ACME-Challenges relevant ist. Der

@@ -65,7 +65,11 @@ fi
 check "Startseite nach Installation 200"              '[ "$(status -L "$BASE/")" = 200 ]'
 check "Startseite enthaelt Blogtitel"                 'curl -sL "$BASE/" | grep -q "gatling Testblog"'
 check "REST-API antwortet (JSON)"                     'curl -sL "$BASE/?rest_route=/" | grep -q "\"namespaces\""'
-check "PATH_INFO-Permalink /index.php/... liefert kein 404" '[ "$(status -L "$BASE/index.php/hello-world/")" != 404 ]'
+check "Beitrag ueber einfachen Permalink /?p=1"       'curl -sL "$BASE/?p=1" | grep -qi "hello world"'
+# gatling muss /index.php/<pfad> als PATH_INFO an PHP geben (kein eigener 404).
+# WordPress leitet mit "einfachen" Permalinks per redirect_canonical auf
+# /<pfad> um, das ist erwartet; nur ein 404 direkt von gatling waere ein Fehler.
+check "PATH_INFO /index.php/... wird an PHP durchgereicht" 'c=$(status "$BASE/index.php/hello-world/"); [ "$c" != 404 ]'
 check "Login-Formular per POST antwortet (302 oder 200)" 'c=$(status -X POST -d "log=x&pwd=y&wp-submit=1" "$BASE/wp-login.php"); [ "$c" = 200 ] || [ "$c" = 302 ]'
 
 [ $fail -eq 0 ] && echo "alle Tests bestanden" || { echo "es gab Fehler"; exit 1; }
