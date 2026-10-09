@@ -116,10 +116,11 @@ Die Optionen stammen aus der Usage-Ausgabe und dem Quelltext von gatling
   binden noch die Kennung wechseln kann. `GATLING_CHROOT=0` ist dann
   ebenfalls nötig.
 
-## Was nicht geprüft wurde
+## Stand der Prüfung
 
-Die Dateien wurden auf einem Rechner ohne Docker erstellt und nur statisch
-validiert (YAML-Syntax, `sh -n`). Der erste echte Lauf sollte auf einer
-Maschine mit Docker über `build.sh` und die `test.sh` erfolgen. Der
-Workflow unter `.github/workflows/build.yml` macht genau das für die
-Szenarien 1 und 2 und prüft die Compose-Syntax aller vier.
+Der Workflow unter `.github/workflows/build.yml` baut das Image und lässt
+die Szenarien 1 und 2 bei jedem Push laufen. Beide sind in GitHub Actions
+grün, inklusive WordPress-Installation per POST über FastCGI. Die Szenarien
+3 (Tor) und 4 (Let's Encrypt) werden dort nur auf gültige Compose-Syntax
+geprüft, weil sie das Tor-Netz beziehungsweise eine öffentliche Domain
+brauchen. Ihre Testskripte sind bisher nicht real gelaufen.
