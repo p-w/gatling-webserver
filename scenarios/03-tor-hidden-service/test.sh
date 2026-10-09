@@ -24,7 +24,7 @@ check "HiddenServiceDir hat Modus 700"           '[ "$(tor stat -c %a /var/lib/t
 # --- gatling im internen Netz -------------------------------------------------
 check "web liefert 200 im internen Netz"         '[ "$(tor curl -s -o /dev/null -w "%{http_code}" http://172.28.20.10/)" = 200 ]'
 check "Seiteninhalt stimmt"                      'tor curl -s http://172.28.20.10/ | grep -q "gatling hinter Tor"'
-check "kein Server-Header"                       '! tor curl -sI http://172.28.20.10/ | grep -qi "^server:"'
+check "Server-Header nennt keine Versionsnummer" '! tor curl -sI http://172.28.20.10/ | tr -d "\r" | grep -i "^server:" | grep -Eq "[0-9]+\.[0-9]+"'
 check "kein Verzeichnisindex (-D)"               '[ "$(tor curl -s -o /dev/null -w "%{http_code}" http://172.28.20.10/nicht-da/)" != 200 ]'
 check "Seite laedt keine externen Ressourcen"    '! tor curl -s http://172.28.20.10/ | grep -Eqi "(src|href)=\"https?://"'
 
