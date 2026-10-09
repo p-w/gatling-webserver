@@ -132,7 +132,7 @@ The entrypoint creates the `.proxy` marker that gatling requires for proxy mode.
 
 ### Tor hidden service
 
-gatling is a good fit as the web backend of an onion service: it is small, sends no `Server` header, and `-n` switches the access log off so visitors leave no traces in the container. Do not publish a host port, only Tor may reach the web container.
+gatling is a good fit as the web backend of an onion service: it is small, has no scripting runtime, and `-n` switches the access log off so visitors leave no traces in the container. Note that gatling answers with `Server: Gatling/0.17` and offers no option to suppress it; if that fingerprint matters, strip the header in a reverse proxy. Do not publish a host port, only Tor may reach the web container.
 
 ```yaml
 services:

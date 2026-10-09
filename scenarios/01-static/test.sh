@@ -33,6 +33,6 @@ check "HEAD liefert Content-Length"             'header "$BASE/downloads/lorem.t
 check "Keep-Alive: zweiter Request nutzt Verbindung wieder" 'curl -s -o /dev/null -o /dev/null -w "%{num_connects}\n" "$BASE/" "$BASE/robots.txt" | tail -1 | grep -q "^0$"'
 check "Dotfile /.secret ist nicht erreichbar"   '[ "$(status "$BASE/.secret")" != 200 ]'
 check "Pfad-Ausbruch /../etc/passwd liefert kein 200" '[ "$(status --path-as-is "$BASE/../etc/passwd")" != 200 ]'
-check "Server-Header nennt keine Versionsnummer" '! header "$BASE/" server | grep -Eq "[0-9]+\.[0-9]+"'
+check "Server-Header ist Gatling/<version>"      'header "$BASE/" server | grep -Eq "^Gatling/[0-9]+\.[0-9]+"'
 
 [ $fail -eq 0 ] && echo "alle Tests bestanden" || { echo "es gab Fehler"; exit 1; }

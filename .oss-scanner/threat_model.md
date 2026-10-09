@@ -87,9 +87,10 @@ compose files (nginx, caddy, mariadb, wordpress, tor), and the `dl`,
   suggestions for the entrypoint without a demonstrated impact.
 
 Do not report: the absence of TLS in the image (documented, handled by a
-reverse proxy), the missing `Server` header, the lack of HTTP/2, the use
-of HTTP/1.x only, and the unauthenticated CVS checkout unless you can show
-a practical attack during the build.
+reverse proxy), the `Server: Gatling/0.17` header (known, not
+configurable), the lack of HTTP/2, the use of HTTP/1.x only, and the
+unauthenticated CVS checkout unless you can show a practical attack during
+the build.
 
 ## Reports and patches
 

@@ -104,9 +104,9 @@ Several properties of `gatling` are relevant to the research use case and
 are documented in the repository because they differ from the behaviour
 of mainstream servers: only world-readable files are served, which
 prevents accidental publication; request paths containing `/.` are
-rewritten so that dot-files are never reachable; pre-compressed
+rewritten so that dot-files are never reachable; and pre-compressed
 `file.html.gz` variants are served transparently when the client accepts
-gzip; and no `Server` header is emitted. The repository contains four
+gzip. The repository contains four
 operating scenarios as `docker compose` stacks with smoke tests: static
 files, WordPress behind `php-fpm`, a Tor onion service, and TLS
 termination with Let's Encrypt via a reverse proxy.

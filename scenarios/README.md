@@ -101,8 +101,10 @@ Die Optionen stammen aus der Usage-Ausgabe und dem Quelltext von gatling
 - **Nur weltlesbare Dateien werden ausgeliefert.** Bind-Mounts von Linux-Hosts
   brauchen `o+r` auf den Dateien. Auf Windows- und macOS-Hosts ist das durch
   Docker Desktop automatisch der Fall.
-- **Kein `Server:`-Header.** gatling verrät sich in der Antwort nicht, das ist
-  für das Tor-Szenario ein Vorteil gegenüber nginx.
+- **`Server: Gatling/0.17` wird immer gesendet.** gatling hat keine Option,
+  den Header abzuschalten, in der CI bestätigt. Wer das Fingerprinting im
+  Tor-Szenario vermeiden will, braucht einen Reverse Proxy davor, der den
+  Header entfernt.
 - **Tor löst das Ziel in `HiddenServicePort` einmal beim Start auf.** Deshalb
   hat der Web-Container in Szenario 3 eine feste IP, ein Neustart von `web`
   bleibt so für Tor unsichtbar.

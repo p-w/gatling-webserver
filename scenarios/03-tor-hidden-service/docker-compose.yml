@@ -7,8 +7,9 @@
 #   * web bindet KEINEN Host-Port. Erreichbar nur aus dem internen Netz,
 #     also nur ueber Tor.
 #   * gatling laeuft mit -n (kein Zugriffslog), -D (kein Verzeichnisindex),
-#     chroot auf /var/www und als nobody. gatling sendet keinen
-#     Server-Header, es gibt also nichts zu verstecken.
+#     chroot auf /var/www und als nobody. gatling sendet "Server: Gatling/0.17"
+#     und kann das nicht abschalten; wer den Header loswerden will, setzt
+#     einen Reverse Proxy davor.
 #   * Tor braucht Modus 700 auf dem HiddenServiceDir; das wird beim Start
 #     gesetzt. Tor laeuft nach dem Start als Benutzer "tor" (torrc: User tor).
 #   * Die .onion-Adresse liegt nach dem ersten Start im Volume tor-keys:
