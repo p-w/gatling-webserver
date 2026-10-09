@@ -19,21 +19,23 @@ echo "warte auf $BASE (WordPress-Image kopiert beim ersten Start die Dateien) ..
 code=000
 for i in $(seq 1 90); do
   code=$(status "$BASE/wp-login.php")
-  [ "$code" = 200 ] && break
+  # 200: installiert, 302: frische Installation leitet auf wp-admin/install.php um
+  { [ "$code" = 200 ] || [ "$code" = 302 ]; } && break
   sleep 2
 done
 echo "wp-login.php -> HTTP $code"
 
 # --- FastCGI-Grundfunktion --------------------------------------------------
-check "wp-login.php wird von PHP gerendert (200)"     '[ "$(status "$BASE/wp-login.php")" = 200 ]'
-check "PHP-Antwort enthaelt WordPress-Markup"         'curl -s "$BASE/wp-login.php" | grep -qi "wordpress"'
+check "wp-login.php wird von PHP beantwortet (200 oder 302)" '[ "$code" = 200 ] || [ "$code" = 302 ]'
+check "PHP-Antwort enthaelt WordPress-Markup"         'curl -sL "$BASE/wp-login.php" | grep -qi "wordpress"'
+check "PHP setzt eigene Antwort-Header (X-Redirect-By oder Set-Cookie oder Link)" 'curl -sIL "$BASE/wp-login.php" | grep -Eqi "^(x-redirect-by|set-cookie|link|x-powered-by):"'
 check "Verzeichnis / geht per -I an index.php"        '[ "$(status "$BASE/")" != 404 ]'
 check "Startseite ist HTML von PHP (kein Dir-Index)"  '! curl -sL "$BASE/" | grep -q "Index of"'
 
 # --- Statisches direkt von gatling ----------------------------------------
 check "statisches JS direkt (200)"                    '[ "$(status "$BASE/wp-includes/js/wp-embed.min.js")" = 200 ]'
 check "statisches JS hat JS-Content-Type"             'header "$BASE/wp-includes/js/wp-embed.min.js" content-type | grep -qi "javascript"'
-check "readme.html statisch (200)"                    '[ "$(status "$BASE/readme.html")" = 200 ]'
+check "jQuery statisch (200)"                         '[ "$(status "$BASE/wp-includes/js/jquery/jquery.min.js")" = 200 ]'
 check "CSS statisch (text/css)"                       'header "$BASE/wp-includes/css/dashicons.min.css" content-type | grep -qi "text/css"'
 
 # --- Sicherheit ----------------------------------------------------------
@@ -41,7 +43,8 @@ check "wp-config.php wird nicht als Quelltext geliefert" '! curl -s "$BASE/wp-co
 check ".proxy-Marker nicht abrufbar"                  '[ "$(status "$BASE/.proxy")" != 200 ]'
 
 # --- Installation per POST (testet FastCGI mit Request-Body) ---------------
-if curl -s "$BASE/wp-admin/install.php" | grep -q 'name="weblog_title"'; then
+# Ohne step zeigt install.php erst die Sprachauswahl, das Formular kommt bei step=1.
+if curl -s "$BASE/wp-admin/install.php?step=1" | grep -q 'name="weblog_title"'; then
   echo "WordPress ist noch nicht installiert, fuehre Installation aus ..."
   out=$(curl -s -X POST "$BASE/wp-admin/install.php?step=2" \
       --data-urlencode "weblog_title=gatling Testblog" \
@@ -54,6 +57,7 @@ if curl -s "$BASE/wp-admin/install.php" | grep -q 'name="weblog_title"'; then
       --data-urlencode "Submit=Install WordPress" \
       --data-urlencode "language=")
   check "Installation per POST erfolgreich"           'echo "$out" | grep -qi "success\|erfolg\|wp-login.php"'
+  echo "$out" | grep -qi "success\|erfolg\|wp-login.php" || { echo "--- Antwort von install.php (gekuerzt) ---"; echo "$out" | sed 's/<[^>]*>//g' | grep -v '^\s*$' | head -20; }
 else
   echo "WordPress ist bereits installiert."
 fi
