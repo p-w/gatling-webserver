@@ -1,0 +1,9 @@
+# Dateien, die im Container ausgefuehrt oder gelesen werden, muessen LF
+# behalten. Mit CRLF scheitert "#!/bin/sh" im Entrypoint.
+*.sh        text eol=lf
+Dockerfile  text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+Caddyfile   text eol=lf
+torrc       text eol=lf
+*.md        text eol=lf

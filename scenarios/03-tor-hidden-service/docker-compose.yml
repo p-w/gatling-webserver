@@ -1,0 +1,74 @@
+# Szenario 3: Tor Hidden Service, gatling als Webserver statt nginx
+#
+# Vergleichbar mit dem Deployment "Letztes Signal" (nginx:alpine + tor in
+# alpine), nur dass gatling die statische Seite ausliefert.
+#
+# Eigenschaften:
+#   * web bindet KEINEN Host-Port. Erreichbar nur aus dem internen Netz,
+#     also nur ueber Tor.
+#   * gatling laeuft mit -n (kein Zugriffslog), -D (kein Verzeichnisindex),
+#     chroot auf /var/www und als nobody. gatling sendet keinen
+#     Server-Header, es gibt also nichts zu verstecken.
+#   * Tor braucht Modus 700 auf dem HiddenServiceDir; das wird beim Start
+#     gesetzt. Tor laeuft nach dem Start als Benutzer "tor" (torrc: User tor).
+#   * Die .onion-Adresse liegt nach dem ersten Start im Volume tor-keys:
+#       docker compose exec tor cat /var/lib/tor/hs/hostname
+#     Die Schluessel (hs_ed25519_secret_key) sichern, sonst aendert sich die
+#     Adresse bei jedem Neuaufbau des Volumes.
+#   * Tor loest das Ziel aus HiddenServicePort einmal beim Start auf. Damit
+#     ein Neustart von web keine tote Adresse hinterlaesst, hat web eine
+#     feste IP im internen Netz.
+#
+#   docker compose up -d --build
+#   sh test.sh
+#   docker compose down            # Volume tor-keys bleibt erhalten
+#   docker compose down -v         # loescht auch die .onion-Schluessel!
+
+services:
+  web:
+    build:
+      context: ../..
+    image: wilfahrt/gatling-webserver:dev
+    environment:
+      # -n: kein Zugriffslog, Besucher hinterlassen keine Spuren im Container
+      GATLING_OPTIONS: "-F -S -V -D -n"
+    volumes:
+      - ./site:/var/www:ro
+    networks:
+      internal:
+        ipv4_address: 172.28.20.10
+    read_only: true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - SYS_CHROOT
+      - SETUID
+      - SETGID
+    restart: unless-stopped
+
+  tor:
+    image: alpine:3.22
+    command: >
+      sh -c "apk add --no-cache tor curl
+      && mkdir -p /var/lib/tor/hs
+      && chown -R tor:tor /var/lib/tor
+      && chmod 700 /var/lib/tor /var/lib/tor/hs
+      && exec tor -f /etc/tor/torrc"
+    volumes:
+      - ./tor/torrc:/etc/tor/torrc:ro
+      - tor-keys:/var/lib/tor/hs
+    depends_on:
+      - web
+    networks:
+      - internal
+    restart: unless-stopped
+
+networks:
+  internal:
+    ipam:
+      config:
+        - subnet: 172.28.20.0/24
+
+volumes:
+  tor-keys:

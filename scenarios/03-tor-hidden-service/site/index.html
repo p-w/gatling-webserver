@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hidden Service auf gatling</title>
+  <style>
+    /* Keine externen Ressourcen: kein CDN, keine Web-Fonts, kein Tracking.
+       Jede Anfrage, die den Tor-Kreislauf verlaesst, gefaehrdet Besucher. */
+    body { margin: 0; background: #0b0f12; color: #d7e0e6; font-family: monospace; }
+    main { max-width: 42rem; margin: 4rem auto; padding: 2rem; }
+    h1 { color: #7ee787; }
+    code { background: #161b22; padding: 0 .3em; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>gatling hinter Tor</h1>
+    <p>Diese Seite wird von gatling aus <code>scenarios/03-tor-hidden-service/site/</code>
+       ausgeliefert und ist nur ueber die .onion-Adresse erreichbar.</p>
+    <p>Fuer den Ernstfall diesen Ordner durch den echten Seiteninhalt ersetzen
+       (zum Beispiel <code>deployment/site/</code> aus dem Referenz-Deployment).</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Caddy vor gatling. Werte kommen aus der Umgebung (siehe docker-compose.yml).
+{
+    email {$ACME_EMAIL}
+    acme_ca {$ACME_CA}
+}
+
+{$DOMAIN} {
+    encode zstd gzip
+    # Caddy setzt X-Forwarded-For und X-Forwarded-Proto von selbst.
+    reverse_proxy gatling:80
+}

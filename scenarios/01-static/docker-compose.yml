@@ -1,0 +1,35 @@
+# Szenario 1: Auslieferung lokaler/statischer Dateien
+#
+# gatling liefert den Ordner ./www aus. Der Entrypoint des Images bindet als
+# root Port 80, wechselt per chroot nach /var/www und laeuft dann als nobody.
+#
+#   docker compose up -d --build
+#   sh test.sh
+#   docker compose down
+
+services:
+  gatling:
+    build:
+      context: ../..
+    image: wilfahrt/gatling-webserver:dev
+    environment:
+      # -F kein FTP, -S kein SMB, -V kein Virtual Hosting,
+      # -d Verzeichnisindex erzeugen (fuer /downloads/)
+      GATLING_OPTIONS: "-F -S -V -d"
+      # Voreinstellungen des Images, hier nur zur Dokumentation:
+      GATLING_ROOT: /var/www
+      GATLING_CHROOT: "1"
+      GATLING_USER: "65534:65534"
+    volumes:
+      - ./www:/var/www:ro
+    ports:
+      - "8080:80"
+    read_only: true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - SYS_CHROOT
+      - SETUID
+      - SETGID
+    restart: unless-stopped

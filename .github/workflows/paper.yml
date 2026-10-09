@@ -1,0 +1,28 @@
+# Baut den JOSS-Paper-Entwurf als PDF. Das PDF liegt danach im Actions-Tab
+# unter "Artifacts" (Name: paper).
+name: Draft PDF
+
+on:
+  push:
+    paths:
+      - "paper/**"
+      - ".github/workflows/paper.yml"
+  workflow_dispatch:
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    name: Paper Draft
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build draft PDF
+        uses: openjournals/openjournals-draft-action@master
+        with:
+          journal: joss
+          paper-path: paper/paper.md
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper
+          path: paper/paper.pdf

@@ -1,0 +1,45 @@
+# Baut das gatling-Image und laesst die Szenarien 1 und 2 als Smoke-Test laufen.
+# Szenario 3 (Tor) braucht das Tor-Netz, Szenario 4 eine oeffentliche Domain.
+# Beide werden nur auf gueltige Compose-Syntax geprueft.
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Image bauen
+        run: sh build.sh wilfahrt/gatling-webserver:dev
+
+      - name: Compose-Dateien validieren
+        env:
+          DOMAIN: www.example.org
+          ACME_EMAIL: admin@example.org
+        run: |
+          for d in scenarios/*/; do
+            echo "== $d"
+            docker compose -f "$d/docker-compose.yml" config -q
+          done
+
+      - name: Szenario 1, statische Dateien
+        working-directory: scenarios/01-static
+        run: |
+          docker compose up -d
+          sh test.sh || { docker compose logs; exit 1; }
+          docker compose down
+
+      - name: Szenario 2, WordPress mit php-fpm
+        working-directory: scenarios/02-wordpress-phpfpm
+        run: |
+          cp .env.example .env
+          docker compose up -d
+          sh test.sh || { docker compose logs; exit 1; }
+          docker compose down -v

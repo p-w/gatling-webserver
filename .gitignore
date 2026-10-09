@@ -53,3 +53,11 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Szenario-Konfiguration mit Passwoertern
+scenarios/**/.env
+
+# Benchmark-Rohdaten und generierte Testdateien
+benchmark/www/
+benchmark/results/*.csv
+!benchmark/results/summary.csv

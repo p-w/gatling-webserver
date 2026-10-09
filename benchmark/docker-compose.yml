@@ -1,0 +1,42 @@
+# Benchmark: vier Webserver-Images auf identischem statischem Inhalt.
+#
+# Alle Server liefern ./www aus und sind nur auf 127.0.0.1 gebunden.
+# Standard-Konfigurationen der offiziellen Images, keine Tuning-Parameter,
+# damit der Vergleich das wiedergibt, was ein Nutzer mit "docker run" bekommt.
+#
+#   sh mkdata.sh                 # Testdateien erzeugen
+#   docker compose up -d --build
+#   sudo sh run.sh               # RAPL braucht root
+#   python3 analyze.py results/*.csv
+
+services:
+  gatling:
+    build:
+      context: ..
+    image: wilfahrt/gatling-webserver:dev
+    volumes:
+      - ./www:/var/www:ro
+    ports:
+      - "127.0.0.1:8081:80"
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./www:/usr/share/nginx/html:ro
+    ports:
+      - "127.0.0.1:8082:80"
+
+  httpd:
+    image: httpd:alpine
+    volumes:
+      - ./www:/usr/local/apache2/htdocs:ro
+    ports:
+      - "127.0.0.1:8083:80"
+
+  caddy:
+    image: caddy:alpine
+    volumes:
+      - ./www:/srv:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    ports:
+      - "127.0.0.1:8084:80"

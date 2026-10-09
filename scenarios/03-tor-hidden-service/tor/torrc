@@ -1,0 +1,13 @@
+# torrc fuer das Compose-Setup. Ziel ist der gatling-Container "web" mit
+# fester IP im internen Netz (siehe docker-compose.yml).
+User tor
+DataDirectory /var/lib/tor
+Log notice stdout
+
+# SOCKS-Port nur fuer den Selbsttest in test.sh (curl --socks5-hostname im
+# tor-Container). Fuer den reinen Betrieb kann hier "SocksPort 0" stehen.
+SocksPort 127.0.0.1:9050
+
+HiddenServiceDir /var/lib/tor/hs/
+HiddenServiceVersion 3
+HiddenServicePort 80 172.28.20.10:80

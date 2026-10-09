@@ -1,0 +1,98 @@
+# Szenario 2: WordPress mit php-fpm hinter gatling (FastCGI ueber TCP)
+#
+# Aufbau:
+#   gatling  ->  liefert statische Dateien direkt aus dem WordPress-Volume
+#            ->  reicht *.php per FastCGI an php-fpm weiter (-O F/ip/port/regex)
+#   php      ->  offizielles wordpress:*-fpm-alpine Image, lauscht auf 9000/tcp
+#   db       ->  MariaDB
+#
+# Wichtige gatling-Eigenheiten:
+#   * -O erwartet eine IP, keinen Hostnamen. Deshalb bekommt php eine feste
+#     Adresse im Compose-Netz (172.28.10.10).
+#   * Der Proxy-Modus ist nur aktiv, wenn im Doc-Root eine Datei ".proxy"
+#     liegt. Der Entrypoint des Images legt sie an, sobald -O gesetzt ist.
+#   * gatling schickt SCRIPT_FILENAME = <cwd von gatling>/<Datei>. Damit
+#     php-fpm die Datei findet, ist das Volume in beiden Containern unter
+#     demselben Pfad (/var/www/html) eingehaengt und chroot ist aus.
+#   * -I index.php: bei Verzeichnis-Requests (/, /wp-admin/) wird index.php
+#     probiert und ueber die Proxy-Regel an PHP gegeben.
+#
+#   cp .env.example .env      # Passwoerter anpassen
+#   docker compose up -d --build
+#   sh test.sh                # fuehrt auch die WordPress-Installation aus
+#   -> http://localhost:8081/
+
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_DATABASE: ${WP_DB_NAME:-wordpress}
+      MARIADB_USER: ${WP_DB_USER:-wordpress}
+      MARIADB_PASSWORD: ${WP_DB_PASSWORD:-wordpress}
+      MARIADB_ROOT_PASSWORD: ${WP_DB_ROOT_PASSWORD:-root-change-me}
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - backend
+    restart: unless-stopped
+
+  php:
+    image: wordpress:php8.3-fpm-alpine
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${WP_DB_NAME:-wordpress}
+      WORDPRESS_DB_USER: ${WP_DB_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${WP_DB_PASSWORD:-wordpress}
+      # gatling terminiert kein TLS. Hinter einem TLS-Proxy wird hier HTTPS
+      # fuer WordPress sichtbar gemacht, wenn X-Forwarded-Proto gesetzt ist.
+      WORDPRESS_CONFIG_EXTRA: |
+        if (isset($$_SERVER['HTTP_X_FORWARDED_PROTO']) && $$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') { $$_SERVER['HTTPS'] = 'on'; }
+    volumes:
+      - wp-data:/var/www/html
+    networks:
+      backend:
+        ipv4_address: 172.28.10.10
+    restart: unless-stopped
+
+  gatling:
+    build:
+      context: ../..
+    image: wilfahrt/gatling-webserver:dev
+    depends_on:
+      - php
+    environment:
+      GATLING_ROOT: /var/www/html
+      # kein chroot, damit SCRIPT_FILENAME fuer php-fpm stimmt
+      GATLING_CHROOT: "0"
+      # -F -S   kein FTP/SMB        -V  kein Virtual Hosting
+      # -D      kein Verzeichnisindex (WordPress-Ordner nicht auflisten)
+      # -I      index.php als Verzeichnis-Index probieren
+      # -O      FastCGI: alles, was auf \.php passt, an php-fpm (Regex ohne $,
+      #         damit PATH_INFO wie /index.php/2026/09/beitrag/ funktioniert)
+      GATLING_OPTIONS: '-F -S -V -D -I index.php -O F/172.28.10.10/9000/\.php'
+    volumes:
+      # rw, damit der Entrypoint die Marker-Datei .proxy anlegen kann
+      - wp-data:/var/www/html
+    ports:
+      - "8081:80"
+    networks:
+      - backend
+    restart: unless-stopped
+
+networks:
+  backend:
+    ipam:
+      config:
+        - subnet: 172.28.10.0/24
+
+volumes:
+  db-data:
+  wp-data:

@@ -1,0 +1,9 @@
+# Caddy als reiner Dateiserver, Klartext-HTTP auf Port 80, kein Auto-HTTPS.
+{
+    auto_https off
+}
+
+:80 {
+    root * /srv
+    file_server
+}
